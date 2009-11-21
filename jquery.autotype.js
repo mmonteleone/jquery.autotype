@@ -1,5 +1,17 @@
+/**
+ * jQuery.autotype - Simple, accurate, typing simulation for jQuery
+ *
+ * version 0.1
+ * 
+ * http://michaelmonteleone.net/projects/autotype
+ * http://github.com/mmonteleone/jquery.autotype
+ *
+ * Copyright (c) 2009 Michael Monteleone
+ * Licensed under terms of the MIT License (README.markdown)
+ */
 (function($){
     
+    // code type constants
     var CHARACTER = 1,
         NON_CHARACTER = 2,
         MODIFIER_BEGIN = 3,
@@ -15,8 +27,11 @@
                 return isUpper(char) ? char.toLowerCase() : char.toUpperCase();
             },
         parseCodes = function(value, codeMap) {
+                // buffer to hold a collection of key/char code pairs corresponding to input string value
             var codes = [],
+                // buffer to hold the name of a control key as it's being parsed
                 definingControlKey = false,
+                // hold a collection of currently pushed modifier keys
                 activeModifiers = {
                     alt: false,
                     meta: false,
@@ -24,6 +39,7 @@
                     ctrl: false
                 },
                 explicitModifiers = $.extend({}, activeModifiers),
+                // buffer to hold construction of current control key
                 currentControlKey = '',
                 previousChar = '', 
                 pushCode = function(opts) {
@@ -49,32 +65,39 @@
                 };
             
             for(var i=0;i<value.length;i++) {
+                // if the character is about to define a control key
                 if(!definingControlKey && 
                     i <= value.length - 5 && 
                     value.charAt(i) === '{' && 
                     value.charAt(i+1) === '{') 
                 {
+                    // skip the next "{"                    
                     i++;
                     
                     definingControlKey = true;
                 } 
+                // if the character is about to end definition of control key
                 else if (definingControlKey && 
                     i <= value.length - 2 &&
                     value.charAt(i) === '}' &&
                     value.charAt(i+1) === '}')
                 {
+                    // skip the next "}"
                     i++;
                 
+                    // check if this key is a modifier-opener (is a ctrl,alt,del,shift)
                     if(activeModifiers[currentControlKey] !== undefined) 
                     {
                         explicitModifiers[currentControlKey] = true;
                         pushModifierBeginCode(currentControlKey);
                     } 
+                    // check if this key is a modifier-closer (is a /ctrl,/alt,/del,.shift)                
                     else if(activeModifiers[currentControlKey.substring(1)] !== undefined) 
                     {
                         explicitModifiers[currentControlKey] = false;
                         pushModifierEndCode(currentControlKey.substring(1));
                     } 
+                    // otherwise is some other kind of non-modifier control key
                     else 
                     {
                         pushCode({
@@ -89,14 +112,18 @@
                     definingControlKey = false;
                     currentControlKey = '';
                 }
+                // currently defining control key
                 else if (definingControlKey) 
                 {
                     currentControlKey += value.charAt(i);
                 } 
+                // otherwise is just a text character
                 else 
                 {
                     var character = value.charAt(i);
                     
+                    // check for any implicitly changing of cases, and register presses/releases
+                    // of the shift key in accord with them.
                     if(
                         (!isNullOrEmpty(previousChar) && areDifferentlyCased(previousChar, character)) ||
                         (isNullOrEmpty(previousChar) && isUpper(character))
@@ -109,21 +136,27 @@
                         }
                     }
                     
+                    // modify the current character if there are active modifiers
                     if((activeModifiers.shift && isLower(character)) || 
                         (!activeModifiers.shift && isUpper(character))) {
+                        // shift converts case
                         character = convertCase(character);
                     }
                     
                     var code = {
+                        // if can't identify a keycode, just fudge with the char code.
+                        // nope, this isn't ideal by any means.
                         keyCode: codeMap[character] || character.charCodeAt(0),
                         charCode: character.charCodeAt(0),
                         char: character,
                         type: CHARACTER
                     };
                     
+                    // modify the current character if there are active modifiers
                     if(activeModifiers.alt || 
                         activeModifiers.ctrl ||
                         activeModifiers.meta) {
+                        // alt, ctrl, meta make it so nothing is typed
                         code.char = '';
                     }
                     pushCode(code); 
@@ -133,6 +166,9 @@
             return codes;        
         },    
         triggerCodeOnField = function(code, field) {
+            // build up base content that every event should contain
+            // with information about whether certain chord keys are 
+            // simulated as being pressed
             var evnt = {
                 altKey: code.alt,
                 metaKey: code.meta,
@@ -140,18 +176,24 @@
                 ctrlKey: code.ctrl
             };
 
+            // build out 3 event instances for all the steps of a key entry
             var keyDownEvent = $.extend($.Event(), evnt, {type:'keydown', keyCode: code.keyCode, charCode: 0});
             var keyPressEvent = $.extend($.Event(), evnt, {type:'keypress', keyCode: 0, charCode: code.charCode});
             var keyUpEvent = $.extend($.Event(), evnt, {type:'keyup', keyCode: code.keyCode, charCode: 0});
         
+            // go ahead and trigger the first 2 (down and press)         
+            // a keyup of a modifier shouldn't also re-trigger a keydown       
             if(code.type !== MODIFIER_END) {
                 field.trigger(keyDownEvent);                    
             }
             
+            // modifier keys don't have a keypress event, only down or up
             if(code.type !== MODIFIER_BEGIN && code.type !== MODIFIER_END) {
                 field.trigger(keyPressEvent);
             }
             
+            // only actually add the new character to the input if the keydown or keypress events 
+            // weren't cancelled by any consuming event handlers
             if(!keyDownEvent.isPropagationStopped() && 
                 !keyPressEvent.isPropagationStopped()) {
                 if(code.type === NON_CHARACTER) {
@@ -168,6 +210,8 @@
                 }
             }
         
+            // then also trigger the 3rd event (up)
+            // a keydown of a modifier shouldn't also trigger a keyup until coded
             if(code.type !== MODIFIER_BEGIN) {
                 field.trigger(keyUpEvent);                    
             }                        
@@ -194,7 +238,15 @@
     $.fn.autotype = function(value, options) {
         if(value === undefined || value === null) { throw("Value is required by jQuery.autotype plugin"); }
         var settings = $.extend({}, $.fn.autotype.defaults, options);        
+
+        // 1st Pass        
+        // step through the input string and convert it into 
+        // a logical sequence of steps, key, and charcodes to apply to the inputs
         var codes = parseCodes(value, settings.keyCodes[settings.keyBoard]);
+
+        // 2nd Pass
+        // Run the translated codes against each input through a realistic
+        // and cancelable series of key down/press/up events        
         return this.each(function(){ triggerCodesOnField(codes, $(this), settings.delay, settings.global); });
     };
     
