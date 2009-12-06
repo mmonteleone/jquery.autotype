@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>jQuery.autotype Example 1</title>
+
+<style type="text/css" media="screen">
+textarea {
+    width: 300px;
+    border: 1px solid #BBB;
+    padding: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: helvetica, arial, sans-serif;
+}    
+</style>
+	
+<script src="../lib/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../jquery.autotype.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
+
+$(document).ready(function(){
+
+    var logText = function(msg) {
+            $('#log').html($('#log').html() + msg + "\n");        
+        },
+        logEvent = function(e, field) {
+            logText('event: e.type:' + e.type + ' e.keyCode:' + e.keyCode + ' e.charCode:' + e.charCode + ' e.shiftKey:' + e.shiftKey + ',  current value:"' + $(field).val().replace(/\n/,'\\n') + '"');        
+        };
+    
+    $('textarea')
+        .val('')    
+        .bind('keydown keypress keyup',function(e){ logEvent(e,this); })
+        .bind('autotyped', function(){ logText('Auto-Typing Completed!'); })
+        .autotype("Hello Their{{back}}{{back}}re. {{enter}}Bye {{shift}}now{{/shift}}.", {delay: 50});
+        
+});
+        
+</script>	
+	
+</head>
+
+<body>
+
+<h1>jQuery.autotype Example 1</h1>
+
+<p>In which the following autotype produces a series of correctly ordered events and input value modifications, interspersed with control keys and modifiers. </p>
+
+<pre>
+    $('textarea').autotype("Hello Their{{back}}{{back}}re. {{enter}}Bye {{shift}}now{{/shift}}.", {delay: 50});
+</pre>
+
+<form action="" method="" accept-charset="utf-8">
+
+    <h2>Text Area</h2>
+    <textarea></textarea>
+
+</form>
+
+<h2>Event log</h2>
+<pre id="log" />
+
+</body>
+</html>
