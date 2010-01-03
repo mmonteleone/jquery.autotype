@@ -1,7 +1,7 @@
 /**
  * jQuery.autotype - Simple, accurate, typing simulation for jQuery
  *
- * version 0.1
+ * version 0.5.0
  * 
  * http://michaelmonteleone.net/projects/autotype
  * http://github.com/mmonteleone/jquery.autotype

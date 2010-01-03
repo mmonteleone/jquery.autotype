@@ -27,23 +27,23 @@ Equally simple are the abilities to both read and modify the value of an input.
 
 *But as it turns out*, if you want to simulate the *exact* sequence of events that would happen **if someone were to actually type "Hello" into the input**, it's more complex than simply `$('input').val('Hello');`.  The real sequence of events that would occur had this been typed by a real user, given that 'e' refers to the DOM events passed to the handlers:
 
-  1. ***shift* key pressed down (`e.type: keydown, e.keyCode: 0, e.charCode: 0, e.shiftKey: true`)**
-  2. *h* key pressed down (`e.type: keydown, e.keyCode: 0, e.charCode: 0, e.shiftKey: true`)
-  3. *h* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 0, e.shiftKey: true`)
-  4. *h* key released (`e.type: keyup, e.keyCode: 0, e.charCode: 0, e.shiftKey: true`)
-  5. ***shift* key released (`e.type: keyup, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)**
-  6. *e* key pressed down (`e.type: keydown, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  7. *e* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  8. *e* key released (`e.type: keyup, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  9. *l* key pressed down (`e.type: keydown, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  10. *l* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  11. *l* key released (`e.type: keyup, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  12. *l* key pressed down (`e.type: keydown, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  13. *l* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  14. *l* key released (`e.type: keyup, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  15. *o* key pressed down (`e.type: keydown, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  16. *o* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
-  17. *o* key released (`e.type: keyup, e.keyCode: 0, e.charCode: 0, e.shiftKey: false`)
+  1. ***shift* key pressed down (`e.type: keydown, e.keyCode: 16, e.charCode: 0, e.shiftKey: true`)**
+  2. *h* key pressed down (`e.type: keydown, e.keyCode: 72, e.charCode: 0, e.shiftKey: true`)
+  3. *h* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 72, e.shiftKey: true`)
+  4. *h* key released (`e.type: keyup, e.keyCode: 72, e.charCode: 0, e.shiftKey: true`)
+  5. ***shift* key released (`e.type: keyup, e.keyCode: 16, e.charCode: 0, e.shiftKey: false`)**
+  6. *e* key pressed down (`e.type: keydown, e.keyCode: 69, e.charCode: 0, e.shiftKey: false`)
+  7. *e* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 101, e.shiftKey: false`)
+  8. *e* key released (`e.type: keyup, e.keyCode: 69, e.charCode: 0, e.shiftKey: false`)
+  9. *l* key pressed down (`e.type: keydown, e.keyCode: 76, e.charCode: 0, e.shiftKey: false`)
+  10. *l* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 108, e.shiftKey: false`)
+  11. *l* key released (`e.type: keyup, e.keyCode: 76, e.charCode: 0, e.shiftKey: false`)
+  12. *l* key pressed down (`e.type: keydown, e.keyCode: 76, e.charCode: 0, e.shiftKey: false`)
+  13. *l* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 108, e.shiftKey: false`)
+  14. *l* key released (`e.type: keyup, e.keyCode: 76, e.charCode: 0, e.shiftKey: false`)
+  15. *o* key pressed down (`e.type: keydown, e.keyCode: 79, e.charCode: 0, e.shiftKey: false`)
+  16. *o* key being pressed (`e.type: keypress, e.keyCode: 0, e.charCode: 111, e.shiftKey: false`)
+  17. *o* key released (`e.type: keyup, e.keyCode: 79, e.charCode: 0, e.shiftKey: false`)
 
 **And so, jQuery.autotype allows for all of those events to happen properly:**  
 
