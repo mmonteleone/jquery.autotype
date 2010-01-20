@@ -40,7 +40,7 @@ task :build => [:clean] do
   cp 'example/example2.html', 'dist/example/example2.html'
 
   # copy lib
-  cp 'lib/jquery-1.3.2.min.js', 'dist/lib/jquery-1.3.2.min.js'
+  cp 'lib/jquery-1.4.min.js', 'dist/lib/jquery-1.4.min.js'
   cp 'lib/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'
   cp 'lib/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
   

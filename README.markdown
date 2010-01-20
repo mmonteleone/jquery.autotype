@@ -116,13 +116,13 @@ jQuery.autotype requires:
 
   * [jQuery][3] 1.3.2 or greater
 
-This is included included with jQuery.autotype.
+jQuery 1.4 is included with jQuery.autotype.
 
 You can download the [zipped release][8] containing a minified build with examples and documentation or the development master with unit tests by cloning `git://github.com/mmonteleone/jquery.autotype.git`.
 
-jQuery.autotype requires [jquery][3] 1.3.2, and and can be installed thusly 
+jQuery.autotype requires [jquery][3] 1.3.2 or greater, and and can be installed thusly 
 
-    <script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="jquery-1.4.min.js"></script>
     <script type="text/javascript" src="jquery.autotype.min.js"></script>
 
 jQuery.autotype includes a full unit test suite, and has been verified to work against Firefox 3.5, Safari 4, Internet Explorer 6,7,8, Chrome, and Opera 9 and 10.  Please feel free to test its suite against other browsers.
