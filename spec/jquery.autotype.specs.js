@@ -393,7 +393,7 @@ QUnit.specify("jQuery.autotype", function() {
      * Assumes they have each been loaded and set to notConflict(true)
      * aliased as jq14, jq13, etc.
      */
-    each(["1.3.2","1.4"], function(version) {
+    each(["1.3.2","1.4.1"], function(version) {
         describe("in jQ " + version, function(){
             $ = jQuery = window['jq_' + version.replace(/\./g,'_')];
             specification();                    
