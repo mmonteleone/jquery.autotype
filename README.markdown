@@ -59,55 +59,64 @@ Well, that's nice I guess, but why?
 FEATURES.  We got features.
 ---------------------------
 
-  1. Accurately simulates complete sequence of events that occurs during the manual entry of text to a form field, including:
-    * Correctly triggers `keydown`, `keypress`, and `keyup` events
-    * Correctly iteratively modifies the input's value, appending each new character after the `keypress` event, but before the `keyup` event.
-    * Correctly passes proper `keyCode` and `charCode` values (yes, they are sometimes different) within the simulated events.
-    * Correctly passes modifier key information (`altKey`, `ctrlKey`, `shiftKey`, `metaKey`) within the simulated events whenever a modifier key is active.
-    * Correctly raises modifier keys' events interlaced with character keys... i.e. for a capital 'H', it would raise `keydown` of *shift*, `keydown` of *h*, `keypress` of *h*, `keyup` of *h*, and finally `keyup` of *shift*.
-      * within the events raised surrounding the simulation of the press of the 'h' key, the events' `shiftKey` attributes are properly set to `true`. 
-  2. Accurately respects cancellations of key event propagations by client code.  So, the following...
-  
-        // return false from keydown to cancel propagation
-        $('input').keydown(function(){ return false; })
-                  .autotype('Hello');
-                  
-     ...realistically results in no actual content added to the input, while still correctly raising all keydown/press/up events.
-  3. Allows for explicit passing of control keys into the input text via a `{{keyname}}` syntax.  So...
-  
-        $('input').autotype('he{{shift}}ll{{/shift}}o there');
-        
-    ...results in a value of "heLLo there".  Note the control key in this case, 'shift', is also a modifier, so it has a `{{shift}}` to `keydown` it, and a `{{/shift}}` to `keyup` it.
-  4. Also supports modifiers `alt`, `ctrl`, and `meta`.  When these are active, any character key events realistically don't modify the input's value, but do raise standard key events specifying the active state of the modifiers.
-  
-        $('input').autotype('he{{ctrl}}ll{{/ctrl}}o');
-    
-    ... results in an input value of 'heo' since `ctrl` was held down while 'll' was typed.
-  5. Other special control keys can be passed too that aren't modifiers and can't be held/released like a shift
-    * *enter*  
-    
-            $('textarea').autotype('line1 {{enter}} line2');
-         
-         Results in a new line being added to the text area
-    * *back*  
-            
-            $('textarea').autotype('Helloo{{back}}');
-         
-         Results in a back-spaced value of 'Hello' instead of 'Helloo'
-  6. Other control keys are fair game too, `f1`..`f12`, `up`, `down`, `left`, `right`, etc.  But as of now, these don't have a manipulative affect on the input's value.  They do still raise correct realistic events with proper keyCodes.  For a complete list, see the keyCode defaults listing in the bottom of the jQuery.autotype source.
-  7. For fun, allows for an optional millisecond-based delay between key entries
-  
-        $('input').autotype('Hello', {delay: 25});
-        
-    Results in a 25 millisecond delay between each character's entry into the input.
-  8. Raises an `autotyped` event on the input once an entire sequence completes.
-  
-        $('input').bind('autotyped', function(){
-            alert("finished simulating the typing of 'Hello'!");
-        }).autotype('Hello', {delay: 25});
-        
-    The alert would occur after the 125 milliseconds it would have taken for the text to be typed.
+Accurately simulates complete sequence of events that occurs during the manual entry of text to a form field, including:
 
+* Correctly triggers `keydown`, `keypress`, and `keyup` events
+* Correctly iteratively modifies the input's value, appending each new character after the `keypress` event, but before the `keyup` event.
+* Correctly passes proper `keyCode` and `charCode` values (yes, they are sometimes different) within the simulated events.
+* Correctly passes modifier key information (`altKey`, `ctrlKey`, `shiftKey`, `metaKey`) within the simulated events whenever a modifier key is active.
+* Correctly raises modifier keys' events interlaced with character keys... i.e. for a capital 'H', it would raise `keydown` of *shift*, `keydown` of *h*, `keypress` of *h*, `keyup` of *h*, and finally `keyup` of *shift*.
+  * within the events raised surrounding the simulation of the press of the 'h' key, the events' `shiftKey` attributes are properly set to `true`. 
+
+Accurately respects cancellations of key event propagations by client code.  So, the following...
+  
+    // return false from keydown to cancel propagation
+    $('input').keydown(function(){ return false; })
+        .autotype('Hello');
+                  
+    // realistically results in no actual content added to the input,
+    // while still correctly raising all keydown/press/up events.
+
+Allows for explicit passing of control keys into the input text via a `{{keyname}}` syntax.  So...
+  
+    $('input').autotype('he{{shift}}ll{{/shift}}o there');
+        
+    // results in a value of "heLLo there".  Note the control key in this 
+    // case, 'shift', is also a modifier, so it has a `{{shift}}` to 
+    // `keydown` it, and a `{{/shift}}` to `keyup` it.
+
+Also supports modifiers `alt`, `ctrl`, and `meta`.  When these are active, any character key events realistically don't modify the input's value, but do raise standard key events specifying the active state of the modifiers.
+  
+    $('input').autotype('he{{ctrl}}ll{{/ctrl}}o');
+    
+    // results in an input value of 'heo' since `ctrl` 
+    // was held down while 'll' was typed.
+
+Other special control keys can be passed too that aren't modifiers and can't be held/released like a shift
+
+    // enter: results in a new line being added to the text area    
+    $('textarea').autotype('line1 {{enter}} line2');
+    
+         
+    // back: results in a back-spaced value of 'Hello' instead of 'Helloo'
+    $('textarea').autotype('Helloo{{back}}');
+         
+Other control keys are fair game too, `f1`..`f12`, `up`, `down`, `left`, `right`, etc.  But as of now, these don't have a manipulative affect on the input's value.  They do still raise correct realistic events with proper keyCodes.  For a complete list, see the keyCode defaults listing in the bottom of the jQuery.autotype source.
+
+For fun, allows for an optional millisecond-based delay between key entries
+  
+    $('input').autotype('Hello', {delay: 25});
+    
+    // results in a 25 millisecond delay between each character's entry into the input.
+
+Raises an `autotyped` event on the input once an entire sequence completes.
+  
+    $('input').bind('autotyped', function(){
+        alert("finished simulating the typing of 'Hello'!");
+    }).autotype('Hello', {delay: 25});
+        
+    // the alert would occur after the 125 milliseconds it 
+    // would have taken for the text to be typed.
 
 Requirements, installation, and notes
 -------------------------------------
