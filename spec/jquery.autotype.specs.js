@@ -102,6 +102,12 @@ QUnit.specify("jQuery.autotype", function() {
                     assert(log[5].value).equals('ab');
                     assert(log[5].type).equals('keyup');                
                 });
+                it('should include which on down, up, and press event', function(){
+                    $('textarea').autotype('a');
+                    assert(log[0].event.which).equals(65);
+                    assert(log[1].event.which).equals(97);
+                    assert(log[2].event.which).equals(65);
+                });
                 it('should include keycode only on down and up event', function(){
                     $('textarea').autotype('a');
                     assert(log[0].event.keyCode).equals(65);
@@ -185,6 +191,13 @@ QUnit.specify("jQuery.autotype", function() {
                         assert(log.length).equals(3);
                         assert(log[0].event.keyCode).equals(expectedKeyCode);
                         assert(log[2].event.keyCode).equals(expectedKeyCode);
+                    });
+                given(['pgup',33],['pgdn',34],['home',36],['end',35],['left',37],['right',39],['down',40],['up',38]).
+                    it('should pass correct which codes for non-modifier control keys', function(keyName, expectedWhichCode) {
+                        $('textarea').autotype('{{' + keyName + '}}');
+                        assert(log.length).equals(3);
+                        assert(log[0].event.which).equals(expectedWhichCode);
+                        assert(log[2].event.which).equals(expectedWhichCode);
                     });
                 describe('when contorl key is an enter', function(){
                     it('should add a newline to value', function(){
