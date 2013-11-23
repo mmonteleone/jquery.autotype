@@ -1,12 +1,12 @@
 /**
  * jQuery.autotype - Simple, accurate, typing simulation for jQuery
  *
- * version 0.5.0
+ * version 0.5.1
  * 
  * http://michaelmonteleone.net/projects/autotype
  * http://github.com/mmonteleone/jquery.autotype
  *
- * Copyright (c) 2009 Michael Monteleone
+ * Copyright (c) 2013 Michael Monteleone
  * Licensed under terms of the MIT License (README.markdown)
  */
 (function($){
@@ -165,7 +165,7 @@
             }
             return codes;        
         },    
-        triggerCodeOnField = function(code, field) {
+        triggerCodeOnField = function(code, field, updateFieldValue) {
             // build up base content that every event should contain
             // with information about whether certain chord keys are 
             // simulated as being pressed
@@ -194,20 +194,8 @@
             
             // only actually add the new character to the input if the keydown or keypress events 
             // weren't cancelled by any consuming event handlers
-            if(!keyDownEvent.isPropagationStopped() && 
-                !keyPressEvent.isPropagationStopped()) {
-                if(code.type === NON_CHARACTER) {
-                    switch(code.controlKeyName) {
-                        case 'enter':
-                            field.val(field.val() + "\n");
-                            break;
-                        case 'back':
-                            field.val(field.val().substring(0,field.val().length-1));
-                            break;
-                    }
-                } else {
-                    field.val(field.val() + code.char);                    
-                }
+            if(!keyDownEvent.isPropagationStopped() && !keyPressEvent.isPropagationStopped()) {
+                updateFieldValue(field, code);
             }
         
             // then also trigger the 3rd event (up)
@@ -216,12 +204,12 @@
                 field.trigger(keyUpEvent);                    
             }                        
         },
-        triggerCodesOnField = function(codes, field, delay, global) {
+        triggerCodesOnField = function(codes, field, delay, global, updateFieldValue) {
             if(delay > 0) {
                 codes = codes.reverse();
                 var keyInterval = global.setInterval(function(){
                     var code = codes.pop();
-                    triggerCodeOnField(code, field);
+                    triggerCodeOnField(code, field, updateFieldValue);
                     if(codes.length === 0) {
                         global.clearInterval(keyInterval);
                         field.trigger('autotyped');                            
@@ -229,10 +217,24 @@
                 }, delay);                
             } else {
                 $.each(codes,function(){                    
-                    triggerCodeOnField(this, field);
+                    triggerCodeOnField(this, field, updateFieldValue);
                 });
                 field.trigger('autotyped');
             }                
+        },
+        defaultUpdateFieldValue = function (field, code) {
+            if(code.type === NON_CHARACTER) {
+                switch(code.controlKeyName) {
+                    case 'enter':
+                        field.val(field.val() + "\n");
+                        break;
+                    case 'back':
+                        field.val(field.val().substring(0,field.val().length-1));
+                        break;
+                }
+            } else {
+                field.val(field.val() + code.char);                    
+            }
         };
     
     $.fn.autotype = function(value, options) {
@@ -247,7 +249,7 @@
         // 2nd Pass
         // Run the translated codes against each input through a realistic
         // and cancelable series of key down/press/up events        
-        return this.each(function(){ triggerCodesOnField(codes, $(this), settings.delay, settings.global); });
+        return this.each(function(){ triggerCodesOnField(codes, $(this), settings.delay, settings.global, settings.updateFieldValue); });
     };
     
     $.fn.autotype.defaults = {
@@ -255,6 +257,7 @@
         keyBoard: 'enUs',
         delay: 0,
         global: window,
+        updateFieldValue: defaultUpdateFieldValue,
         keyCodes: {
             enUs: { 'back':8,'ins':45,'del':46,'enter':13,'shift':16,'ctrl':17,'meta':224,
                 'alt':18,'pause':19,'caps':20,'esc':27,'pgup':33,'pgdn':34,
