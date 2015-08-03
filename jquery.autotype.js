@@ -23,6 +23,11 @@
                 return (isUpper(char1) && isLower(char2)) ||
                     (isLower(char1) && isUpper(char2));
             },
+        checkValid = function(field, code) {
+            	var checkMaxlength = (field.attr("maxlength") != null && field.val().length < parseInt(field.attr("maxlength")) 
+            			|| (field.attr("maxlength") == null));
+            	return checkMaxlength;
+            },
         convertCase = function(char) {
                 return isUpper(char) ? char.toLowerCase() : char.toUpperCase();
             },
@@ -206,7 +211,9 @@
                             break;
                     }
                 } else {
-                    field.val(field.val() + code.char);                    
+                	if (checkValid(field, code)) {
+                        field.val(field.val() + code.char);
+                	}
                 }
             }
         
@@ -281,3 +288,4 @@
     };
     
 })(jQuery);
+
