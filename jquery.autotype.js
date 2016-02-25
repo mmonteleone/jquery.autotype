@@ -231,7 +231,8 @@
                     triggerCodeOnField(code, field);
                     if(codes.length === 0) {
                         global.clearInterval(keyInterval);
-                        field.trigger('autotyped');                            
+                        field.trigger('autotyped');
+                        field.trigger('change');
                     }
                 }, delay);                
             } else {
@@ -239,6 +240,7 @@
                     triggerCodeOnField(this, field);
                 });
                 field.trigger('autotyped');
+                field.trigger('change');
             }                
         };
     
